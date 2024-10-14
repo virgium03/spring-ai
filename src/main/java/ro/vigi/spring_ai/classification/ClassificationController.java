@@ -14,7 +14,7 @@ class ClassificationController {
     }
 
     @PostMapping("/classify")
-    String classify(@RequestBody String text) {
+    ClassificationType classify(@RequestBody String text) {
         return textClassifier.classify(text);
     }
 }

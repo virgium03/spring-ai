@@ -24,13 +24,13 @@ class TextClassifier {
                 .build();
     }
 
-    String classify(String text) {
+    ClassificationType classify(String text) {
         return chatClient
                 .prompt()
                 .messages(getPromptWithFewShotsHistory())
                 .user(text)
                 .call()
-                .content();
+                .entity(ClassificationType.class);
     }
 
     private List<Message> getPromptWithFewShotsHistory() {
