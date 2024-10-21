@@ -1,47 +1,63 @@
 package ro.vigi.spring_ai.classification;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 class TextClassifier {
 
     private final ChatClient chatClient;
 
-    TextClassifier(ChatClient.Builder builder) {
+    private final ObjectMapper objectMapper;
+
+    TextClassifier(ChatClient.Builder builder, ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         ChatOptions chatOptions = ChatOptionsBuilder.builder()
                 .withTemperature(0.0D)
                 .build();
         chatClient = builder.defaultOptions(chatOptions)
+                .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }
 
     ClassificationType classify(String text) {
-        return chatClient
+        ChatClient.CallResponseSpec spec = chatClient
                 .prompt()
                 .messages(getPromptWithFewShotsHistory())
                 .user(text)
-                .call()
-                .entity(ClassificationType.class);
+                .call();
+        log.info("--- Response is: [{}].", spec.content());
+        return spec
+                .entity(new ClassificationTypeConverter());
     }
 
     private List<Message> getPromptWithFewShotsHistory() {
         return List.of(
                 new SystemMessage("""
-                        Classify the provided text into one of these classes.
-                        
-                        BUSINESS: Commerce, finance, markets, entrepreneurship, corporate developments.
-                        SPORT: Athletic events, tournament outcomes, performances of athletes and teams.
-                        TECHNOLOGY: innovations and trends in software, artificial intelligence, cybersecurity.
-                        OTHER: Anything that doesn't fit into the other categories.
+                       Classify the provided text into one of these classes.
+                       Do not return anything else except a string representing one of these classes:
+                                               
+                       BUSINESS: Commerce, finance, markets, entrepreneurship, corporate developments.
+                       SPORT: Athletic events, tournament outcomes, performances of athletes and teams.
+                       TECHNOLOGY: innovations and trends in software, artificial intelligence, cybersecurity.
+                       OTHER: Anything that doesn't fit into the other categories.                   
                         """),
 
                 new UserMessage("Apple Vision Pro and the New UEFA Euro App Deliver an Innovative Entertainment Experience."),
