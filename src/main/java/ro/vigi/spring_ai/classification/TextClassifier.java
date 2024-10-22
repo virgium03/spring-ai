@@ -6,16 +6,11 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Function;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,16 +20,13 @@ class TextClassifier {
 
     private final ChatClient chatClient;
 
-    private final ObjectMapper objectMapper;
-
-    TextClassifier(ChatClient.Builder builder, ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    TextClassifier(ChatClient.Builder builder) {
         ChatOptions chatOptions = ChatOptionsBuilder.builder()
-                .withTemperature(0.0D)
-                .build();
+                                                    .withTemperature(0.0D)
+                                                    .build();
         chatClient = builder.defaultOptions(chatOptions)
-                .defaultAdvisors(new SimpleLoggerAdvisor())
-                .build();
+                            .defaultAdvisors(new SimpleLoggerAdvisor())
+                            .build();
     }
 
     ClassificationType classify(String text) {
@@ -51,16 +43,18 @@ class TextClassifier {
     private List<Message> getPromptWithFewShotsHistory() {
         return List.of(
                 new SystemMessage("""
-                       Classify the provided text into one of these classes.
-                       Do not return anything else except a string representing one of these classes:
-                                               
-                       BUSINESS: Commerce, finance, markets, entrepreneurship, corporate developments.
-                       SPORT: Athletic events, tournament outcomes, performances of athletes and teams.
-                       TECHNOLOGY: innovations and trends in software, artificial intelligence, cybersecurity.
-                       OTHER: Anything that doesn't fit into the other categories.                   
-                        """),
+                                          Classify the provided text into one of these classes.
+                                          
+                                          BUSINESS: Commerce, finance, markets, entrepreneurship, corporate developments.
+                                          SPORT: Athletic events, tournament outcomes, performances of athletes and teams.
+                                          TECHNOLOGY: innovations and trends in software, artificial intelligence, cybersecurity.
+                                          OTHER: Anything that doesn't fit into the other categories. 
+                                          
+                                          Do not include any explanations, only provide the classification result.        
+                                          """),
 
-                new UserMessage("Apple Vision Pro and the New UEFA Euro App Deliver an Innovative Entertainment Experience."),
+                new UserMessage(
+                        "Apple Vision Pro and the New UEFA Euro App Deliver an Innovative Entertainment Experience."),
                 new AssistantMessage("TECHNOLOGY"),
                 new UserMessage("Wall Street, Trading Volumes Reach All-Time Highs Amid Market Optimism."),
                 new AssistantMessage("BUSINESS"),
@@ -70,11 +64,12 @@ class TextClassifier {
                 new AssistantMessage("SPORT"),
                 new UserMessage("Culinary Travel, Best Destinations for Food Lovers This Year!"),
                 new AssistantMessage("OTHER"),
-                new UserMessage("UEFA Euro 2024, Memorable Matches and Record-Breaking Goals Define Tournament Highlights."),
+                new UserMessage(
+                        "UEFA Euro 2024, Memorable Matches and Record-Breaking Goals Define Tournament Highlights."),
                 new AssistantMessage("SPORT"),
                 new UserMessage("Rock Band Resurgence, Legendary Groups Return to the Stage with Iconic Performances."),
                 new AssistantMessage("OTHER")
-        );
+                      );
     }
 
 }
