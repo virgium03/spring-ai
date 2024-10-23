@@ -29,7 +29,16 @@ class TextClassifier {
                             .build();
     }
 
-    ClassificationType classify(String text) {
+    String classifyText(String text) {
+        return chatClient
+                .prompt()
+                .messages(getPromptWithFewShotsHistory())
+                .user(text)
+                .call()
+                .content();
+    }
+
+    ClassificationType classifyStructuredText(String text) {
         ChatClient.CallResponseSpec spec = chatClient
                 .prompt()
                 .messages(getPromptWithFewShotsHistory())

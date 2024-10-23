@@ -52,7 +52,7 @@ class TextClassifierTestIT {
     void classify() {
         classificationExamples.forEach((expectedType, testSet) -> {
             for (String textToClassify : testSet) {
-                ClassificationType actualType = textClassifier.classify(textToClassify);
+                ClassificationType actualType = textClassifier.classifyStructuredText(textToClassify);
                 assertThat(actualType)
                         .as("Classifying text: '%s'", textToClassify)
                         .isEqualTo(expectedType);

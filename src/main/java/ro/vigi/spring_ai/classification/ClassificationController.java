@@ -13,8 +13,13 @@ class ClassificationController {
         this.textClassifier = textClassifier;
     }
 
-    @PostMapping("/classify")
-    ClassificationType classify(@RequestBody String text) {
-        return textClassifier.classify(text);
+    @PostMapping("/classifyText")
+    String classifyText(@RequestBody String text) {
+        return textClassifier.classifyText(text);
+    }
+
+    @PostMapping("/classifyStructuredText")
+    ClassificationType classifyStructuredText(@RequestBody String text) {
+        return textClassifier.classifyStructuredText(text);
     }
 }
