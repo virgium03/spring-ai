@@ -1,0 +1,18 @@
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::body}, 'upload_documents_menu')}">
+<body>
+<h2>Upload document</h2>
+<!-- Info or error message -->
+<div th:if="${message}" th:classappend="${messageType}" role="alert" class="alert alert-dismissible fade show">
+    <p th:text="${message}"></p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div class="container">
+    <form th:action="@{/uploadDocument}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <input type="file" name="file" class="form-control-file" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
+</body>
+</html>
