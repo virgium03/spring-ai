@@ -1,14 +1,10 @@
-package ro.vigi.spring_ai.infrastructure;
+package ro.vigi.spring_ai.rag;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.ai.document.Document;
-import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.reader.ExtractedTextFormatter;
-import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
-import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
-import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
+import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -66,14 +62,16 @@ class DocumentsController {
                                       .withNumberOfBottomTextLinesToDelete(1)
                                       .withNumberOfTopTextLinesToDelete(1)
                                       .build();
-        PdfDocumentReaderConfig readerConfig =
-                PdfDocumentReaderConfig.builder()
-                                       .withPageExtractedTextFormatter(extractedTextFormatter)
-                                       .withPagesPerDocument(1)
-                                       .build();
-
-        DocumentReader pdfReader = new PagePdfDocumentReader(file.getResource(), readerConfig);
-
-        return pdfReader.get();
+//        PdfDocumentReaderConfig readerConfig =
+//                PdfDocumentReaderConfig.builder()
+//                                       .withPageExtractedTextFormatter(extractedTextFormatter)
+//                                       .withPagesPerDocument(1)
+//                                       .build();
+//
+//        DocumentReader pdfReader = new PagePdfDocumentReader(file.getResource(), readerConfig);
+//
+//        return pdfReader.get();
+        TikaDocumentReader tikaDocumentReader = new TikaDocumentReader(file.getResource());
+        return tikaDocumentReader.read();
     }
 }
