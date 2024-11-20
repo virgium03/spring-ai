@@ -38,6 +38,7 @@ class DocumentsController {
 
             messageType = "alert-info";
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             message = "Failed to upload " + file.getOriginalFilename() + "!";
             messageType = "alert-danger";
         }
